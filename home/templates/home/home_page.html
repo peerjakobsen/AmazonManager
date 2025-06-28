@@ -12,8 +12,8 @@
 <body class="bg-gray-100 min-h-screen">
     <div class="container mx-auto px-4 py-8">
         <header class="text-center mb-8">
-            <h1 class="text-4xl font-bold text-gray-800 mb-4">{{ page.title }}</h1>
-            <p class="text-lg text-gray-600">Welcome to Amazon Manager</p>
+            <h1 data-testid="page-title" class="text-4xl font-bold text-gray-800 mb-4">{{ page.title }}</h1>
+            <p data-testid="welcome-message" class="text-lg text-gray-600">Welcome to Amazon Manager</p>
         </header>
         
         <main class="max-w-4xl mx-auto">
@@ -25,8 +25,8 @@
                     <!-- Alpine.js example -->
                     <div class="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
                         <p class="text-blue-800 font-medium mb-2">Alpine.js Demo:</p>
-                        <p x-text="message" class="text-blue-600"></p>
-                        <button @click="message = 'Alpine.js is working!'" 
+                        <p data-testid="alpine-message" x-text="message" class="text-blue-600"></p>
+                        <button data-testid="alpine-button" @click="message = 'Alpine.js is working!'" 
                                 class="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
                             Click me (Alpine.js)
                         </button>
@@ -35,13 +35,13 @@
                     <!-- HTMX example -->
                     <div class="mb-6 p-4 bg-green-50 rounded-lg border border-green-200">
                         <p class="text-green-800 font-medium mb-2">HTMX Demo:</p>
-                        <button hx-get="{% url 'htmx_demo' %}" 
+                        <button data-testid="htmx-button" hx-get="{% url 'htmx_demo' %}" 
                                 hx-target="#htmx-result"
                                 hx-swap="innerHTML"
                                 class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors">
                             Load Content (HTMX)
                         </button>
-                        <div id="htmx-result" class="mt-2 text-green-600"></div>
+                        <div data-testid="htmx-result" id="htmx-result" class="mt-2 text-green-600"></div>
                     </div>
                     
                     <!-- Wagtail rich text content -->

@@ -52,6 +52,207 @@ This project follows a modern "hypermedia-driven" approach:
 - HTMX should be loaded before Alpine.js
 - Use `defer` attribute for script loading
 
+### Testing Strategy
+- **Django Unit Tests**: Built-in Django testing framework for models, views, and forms
+- **Selenium Integration Tests**: Browser automation for end-to-end testing
+- **pytest**: Modern testing framework with fixtures and plugins
+- **Test Database**: Automatic test database creation and cleanup
+
+## Testing Framework & Best Practices
+
+### Selenium Testing Setup
+
+#### Dependencies
+```bash
+pip install selenium pytest-django
+```
+
+#### Browser Support
+- **Chrome/Chromium**: Primary browser for testing (with headless support)
+- **Firefox**: Secondary browser support
+- **Headless Mode**: For CI/CD environments and faster test execution
+
+#### Test Structure
+```
+tests/
+├── __init__.py
+├── conftest.py              # pytest configuration and fixtures
+├── selenium/
+│   ├── __init__.py
+│   ├── test_homepage.py     # Homepage functionality tests
+│   ├── test_htmx_functionality.py    # HTMX dynamic content tests
+│   └── test_alpine_functionality.py  # Alpine.js reactivity tests
+└── unit/                    # Unit tests (if needed)
+```
+
+### Selenium Best Practices
+
+#### 1. **Reliable Element Selection**
+- Use `data-testid` attributes for test-specific element identification
+- Avoid CSS selectors that depend on styling classes
+- Prefer semantic selectors when possible
+
+```html
+<!-- Good -->
+<button data-testid="alpine-button" @click="message = 'Alpine.js is working!'">
+    Click me (Alpine.js)
+</button>
+
+<!-- Avoid -->
+<button class="mt-2 px-4 py-2 bg-blue-500">Click me</button>
+```
+
+#### 2. **Explicit Waits Over Implicit Waits**
+- Use `WebDriverWait` with expected conditions
+- Set reasonable timeout values (typically 10-20 seconds)
+- Avoid `time.sleep()` except for specific timing requirements
+
+```python
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+# Good
+wait = WebDriverWait(driver, 20)
+element = wait.until(EC.element_to_be_clickable((By.ID, "submit-button")))
+
+# Avoid
+driver.implicitly_wait(10)  # Less reliable
+time.sleep(5)  # Inflexible
+```
+
+#### 3. **Page Object Model (POM)**
+- Encapsulate page interactions in dedicated classes
+- Separate test logic from page-specific code
+- Improve maintainability and reusability
+
+```python
+class HomePage:
+    def __init__(self, driver):
+        self.driver = driver
+        
+    def click_alpine_button(self):
+        button = self.driver.find_element(By.CSS_SELECTOR, '[data-testid="alpine-button"]')
+        button.click()
+        
+    def get_alpine_message(self):
+        return self.driver.find_element(By.CSS_SELECTOR, '[data-testid="alpine-message"]').text
+```
+
+#### 4. **Test Data Management**
+- Use fixtures for consistent test data setup
+- Clean up test data after each test
+- Use Django's test database features
+
+```python
+@pytest.fixture
+def test_user():
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+    user = User.objects.create_user(username='testuser', password='testpass')
+    yield user
+    user.delete()  # Cleanup
+```
+
+#### 5. **Error Handling and Debugging**
+- Implement screenshot capture on test failures
+- Use try-catch blocks for better error messages
+- Log relevant information for debugging
+
+```python
+def test_alpine_reactivity(self, driver, live_server):
+    try:
+        # Test logic here
+        pass
+    except TimeoutException:
+        self.take_screenshot(driver, "alpine_reactivity_failure")
+        assert False, f"Alpine.js reactivity failed. Current message: '{current_message}'"
+```
+
+#### 6. **Cross-Browser Testing**
+- Support multiple browsers through command-line options
+- Use headless mode for CI/CD pipelines
+- Configure browser-specific options
+
+```bash
+# Run tests with different browsers
+pytest --browser=chrome tests/selenium/
+pytest --browser=firefox tests/selenium/
+pytest --browser=headless-chrome tests/selenium/
+```
+
+#### 7. **Performance Considerations**
+- Use function-scoped fixtures for driver instances
+- Implement parallel test execution when possible
+- Monitor test execution time and optimize slow tests
+
+#### 8. **CI/CD Integration**
+- Use headless browsers in CI environments
+- Configure proper timeouts for CI systems
+- Generate test reports and artifacts
+
+```yaml
+# Example GitHub Actions configuration
+- name: Run Selenium Tests
+  run: |
+    pytest tests/selenium/ --browser=headless-chrome --html=report.html
+```
+
+#### 9. **Test Organization**
+- Group related tests in classes with descriptive names
+- Use pytest markers for test categorization
+- Implement proper test isolation
+
+```python
+@pytest.mark.selenium
+@pytest.mark.slow
+class TestHTMXFunctionality:
+    """Test cases for HTMX dynamic content loading."""
+```
+
+#### 10. **Wagtail CMS Testing**
+- Test content management workflows
+- Verify page publishing and preview functionality
+- Test admin interface interactions
+
+### Running Tests
+
+#### Basic Test Execution
+```bash
+# Run all tests
+pytest
+
+# Run only Selenium tests
+pytest -m selenium
+
+# Run with specific browser
+pytest --browser=chrome tests/selenium/
+
+# Run in headless mode
+pytest --headless tests/selenium/
+
+# Generate HTML report
+pytest --html=report.html tests/selenium/
+```
+
+#### Test Configuration
+The project uses `pytest.ini` for configuration:
+- Django settings module configuration
+- Test discovery patterns
+- Custom markers for test categorization
+- Output formatting options
+
+### Testing HTMX Integration
+- Verify HTMX library loading
+- Test dynamic content updates
+- Validate request/response cycles
+- Check error handling
+
+### Testing Alpine.js Integration
+- Confirm Alpine.js initialization
+- Test reactive data binding
+- Validate component interactions
+- Verify state management
+
 ## Repository Information
 - **GitHub URL**: https://github.com/peerjakobsen/AmazonManager
 - **Initial commit**: Comprehensive Django .gitignore file
