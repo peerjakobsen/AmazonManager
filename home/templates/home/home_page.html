@@ -1,0 +1,58 @@
+{% load static tailwind_tags wagtailcore_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page.title }} - Amazon Manager</title>
+    {% tailwind_css %}
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">{{ page.title }}</h1>
+            <p class="text-lg text-gray-600">Welcome to Amazon Manager</p>
+        </header>
+        
+        <main class="max-w-4xl mx-auto">
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <div x-data="{ message: 'Hello World from Alpine.js!' }" class="text-center">
+                    <h2 class="text-2xl font-semibold mb-4 text-gray-800">Hello World!</h2>
+                    <p class="text-gray-600 mb-4">This is a simple frontpage using Wagtail CMS, Tailwind CSS, and HTMX.</p>
+                    
+                    <!-- Alpine.js example -->
+                    <div class="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                        <p class="text-blue-800 font-medium mb-2">Alpine.js Demo:</p>
+                        <p x-text="message" class="text-blue-600"></p>
+                        <button @click="message = 'Alpine.js is working!'" 
+                                class="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
+                            Click me (Alpine.js)
+                        </button>
+                    </div>
+                    
+                    <!-- HTMX example -->
+                    <div class="mb-6 p-4 bg-green-50 rounded-lg border border-green-200">
+                        <p class="text-green-800 font-medium mb-2">HTMX Demo:</p>
+                        <button hx-get="{% url 'htmx_demo' %}" 
+                                hx-target="#htmx-result"
+                                hx-swap="innerHTML"
+                                class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors">
+                            Load Content (HTMX)
+                        </button>
+                        <div id="htmx-result" class="mt-2 text-green-600"></div>
+                    </div>
+                    
+                    <!-- Wagtail rich text content -->
+                    {% if page.body %}
+                    <div class="prose max-w-none">
+                        {{ page.body|richtext }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
